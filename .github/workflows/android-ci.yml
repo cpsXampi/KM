@@ -6,7 +6,7 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-# Executa os comandos dentro da pasta do projeto
+# Executa dentro da pasta do projeto
 defaults:
   run:
     working-directory: RodoviaRecorder-MVP
@@ -27,3 +27,37 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      # Instala Android SDK e aceita licenças
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-34
+            build-tools;34.0.0
+
+      # Diagnóstico opcional (pode manter)
+      - name: Show project tree
+        run: |
+          pwd
+          ls -la
+          echo "---- APP DIR ----"
+          ls -la app || true
+          echo "---- SETTINGS ----"
+          cat settings.gradle || true
+
+      # Build com Gradle sem precisar do gradlew no repo
+      - name: Build with Gradle (assembleDebug)
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 8.7
+          build-root-directory: RodoviaRecorder-MVP
+          arguments: assembleDebug --stacktrace
+
+      # Publica o APK gerado
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: km-debug-apk
+          path: RodoviaRecorder-MVP/app/build/outputs/apk/debug/app-debug.apk
+``
