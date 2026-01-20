@@ -22,11 +22,57 @@ jobs:
           java-version: "17"
           cache: "gradle"
 
+      # 👉 Corrigido: pacotes em linha única (com aspas nos que têm ;)
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: platform-tools "platforms;android-34" "build-tools;34.0.0"
 
+      # Diagnóstico leve pra confirmar a raiz do projeto
       - name: Show workspace layout
         shell: bash
         run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          echo "---- Conteúdo de RodoviaRecorder-MVP ----"
+          ls -la RodoviaRecorder-MVP || true
+          echo "---- settings.gradle(.kts) ----"
+          (cat RodoviaRecorder-MVP/settings.gradle || cat RodoviaRecorder-MVP/settings.gradle.kts) 2>/dev/null || true
+
+      # Garante wrapper e versão do Gradle/AGP compatíveis com o projeto
+      - name: Sanity check Gradle wrapper
+        shell: bash
+        working-directory: RodoviaRecorder-MVP
+        run: |
+          test -f gradlew || { echo "gradlew não encontrado!"; exit 2; }
+          chmod +x gradlew
+          ./gradlew --version
+
+      # Usa o gradle-build-action com o wrapper do projeto (não força versão)
+      - name: Build with Gradle (assembleDebug)
+        uses: gradle/gradle-build-action@v3
+        with:
+          build-root-directory: RodoviaRecorder-MVP
+          arguments: "assembleDebug --stacktrace --warning-mode all --no-daemon"
+
+      # Sempre coleta relatórios p/ facilitar debug se falhar
+      - name: Upload build reports (sempre)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            RodoviaRecorder-MVP/**/build/reports/**
+            RodoviaRecorder-MVP/**/build/outputs/**
+            RodoviaRecorder-MVP/**/build/*.log
+          if-no-files-found: warn
+
+      # APK de debug
+      - name: Upload APK (se existir)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: km-debug-apk
+          path: RodoviaRecorder-MVP/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+``
