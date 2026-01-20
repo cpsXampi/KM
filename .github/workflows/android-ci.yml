@@ -6,6 +6,7 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Executa os comandos dentro da pasta do projeto
 defaults:
   run:
     working-directory: RodoviaRecorder-MVP
@@ -13,7 +14,7 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -26,17 +27,3 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
-
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: km-debug-apk
-          path: RodoviaRecorder-MVP/app/build/outputs/apk/debug/app-debug.apk
