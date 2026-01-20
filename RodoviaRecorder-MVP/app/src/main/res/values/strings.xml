@@ -1,0 +1,7 @@
+
+<resources>
+    <string name="app_name">Rodovia Recorder</string>
+    <string name="label_br">BR-116</string>
+    <string name="btn_start">Gravar</string>
+    <string name="btn_stop">Parar</string>
+</resources>
