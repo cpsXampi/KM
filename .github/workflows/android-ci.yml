@@ -6,6 +6,11 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# 👉 Aponta o diretório padrão de execução para a pasta do projeto
+defaults:
+  run:
+    working-directory: RodoviaRecorder-MVP
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,14 +30,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      # 👉 Dá permissão de execução ao gradlew que está dentro de RodoviaRecorder-MVP
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      # 👉 Executa o build dentro de RodoviaRecorder-MVP (por causa do defaults.run acima)
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
+      # 👉 Publica o APK no caminho relativo à raiz do repositório
+      # (precisamos sair do working-directory padrão para apontar o arquivo correto)
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: km-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: RodoviaRecorder-MVP/app/build/outputs/apk/debug/app-debug.apk
