@@ -6,10 +6,8 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: bash
-    working-directory: RodoviaRecorder-MVP
+# Removi a seção defaults para eliminar qualquer ambiguidade.
+# Vamos definir shell/working-directory explicitamente nos passos que precisam.
 
 jobs:
   build:
@@ -36,6 +34,8 @@ jobs:
             build-tools;34.0.0
 
       - name: Show project tree
+        shell: bash
+        working-directory: RodoviaRecorder-MVP
         run: |
           pwd
           ls -la
